@@ -1,9 +1,8 @@
-
 {
   "version": 2,
   "builds": [
     {
-      "src": "./",
+      "src": "./index.js",
       "use": "@vercel/node"
     }
   ],
@@ -12,6 +11,6 @@
       "src": "/(.*)",
       "dest": "/"
     }
-  ]
+  ],
+  "public": true
 }
-
