@@ -36,8 +36,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/assets/club", express.static("assets/club"));
-app.use("/assets/person", express.static("assets/person"));
+app.use("/public/club", express.static("public/club"));
+app.use("/public/person", express.static("public/person"));
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/clubs", clubRouter);
