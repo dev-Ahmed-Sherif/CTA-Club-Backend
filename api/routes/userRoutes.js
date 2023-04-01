@@ -168,7 +168,7 @@ router.post("/login", async (req, res) => {
     const passConfirm = await bcrypt.compare(req.body.password, user.password);
     if (passConfirm) {
       // console.log(passConfirm);
-      const token = createToken(req.user._id);
+      const token = createToken(user._id);
       res.cookie("clubToken", token, {
         // secure: true,
         sameSite: "strict",
