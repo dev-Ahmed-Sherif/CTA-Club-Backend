@@ -170,8 +170,9 @@ router.post("/login", async (req, res) => {
       // console.log(passConfirm);
       const token = createToken(user._id);
       res.cookie("clubToken", token, {
-        secure: true,
-        sameSite: "strict",
+        //secure: true,
+        //sameSite: "strict",
+        httpOnly:true,
         path: "/",
         maxAge: maxAge * 1000,
       });
