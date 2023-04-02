@@ -4,9 +4,11 @@ const User = require("../models/User");
 require("dotenv").config();
 
 const requireAuth = (req, res, next) => {
-  const token = req.cookies.clubToken;
-
-  if (token) {
+  const token1 = req.cookies.clubToken;
+  const token2 = req.Cookies.clubToken;
+  console.log(token1);
+  console.log(token2);
+  if (token1) {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decodedToken) => {
       if (err) {
         console.log(err.message);
