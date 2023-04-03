@@ -91,7 +91,7 @@ router.get("/", (req, res) => {
 router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.cookies.clubToken);
   console.log(req.body);
-  if (req.body === null) {
+  if (req.body === {}) {
     console.log("hello user details with token only");
     jwt.verify(
       req.cookies.clubToken,
