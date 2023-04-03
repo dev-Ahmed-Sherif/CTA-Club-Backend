@@ -96,13 +96,13 @@ router.post("/user-details", requireAuth, (req, res) => {
     jwt.verify(
       req.cookies.clubToken,
       process.env.ACCESS_TOKEN_SECRET,
-      (err, decodedToken) => {
+      async (err, decodedToken) => {
         if (err) {
           console.log(err.message);
           res.send({ message: err.message });
         } else {
           console.log(decodedToken);
-          User.findOne({ _id: decodedToken.id })
+          await User.findOne({ _id: decodedToken.id })
             .populate({ path: "userplaygrounds" })
             .then((result) => {
               console.log(result);
