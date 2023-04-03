@@ -92,6 +92,7 @@ router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.cookies.clubToken);
   console.log(req.body);
   if (req.body._id === null) {
+    console.log("hello user details with token only");
     jwt.verify(
       req.cookies.clubToken,
       process.env.ACCESS_TOKEN_SECRET,
@@ -111,6 +112,7 @@ router.post("/user-details", requireAuth, (req, res) => {
       }
     );
   } else {
+    console.log("hello user details with token and id");
     User.findOne({ _id: req.body._id })
       .populate({ path: "userplaygrounds" })
       .then((result) => {
