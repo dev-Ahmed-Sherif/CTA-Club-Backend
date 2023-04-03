@@ -91,7 +91,7 @@ router.get("/", (req, res) => {
 router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.cookies.clubToken);
   console.log(req.body);
-  if (req.body._id === null) {
+  if (req.body === null) {
     console.log("hello user details with token only");
     jwt.verify(
       req.cookies.clubToken,
@@ -171,6 +171,7 @@ router.post("/login", async (req, res) => {
     if (passConfirm) {
       // console.log(passConfirm);
       const token = createToken(user._id);
+      console.log(token);
       res.cookie("clubToken", token, {
         //secure: true,
         //sameSite: "strict",
