@@ -176,6 +176,7 @@ router.post("/login", async (req, res) => {
       const token = createToken(user._id);
       console.log(token);
       res.cookie("clubToken", token, {
+        domain: "cta.onrender.com",
         secure: true,
         sameSite: "None",
         httpOnly:true,
