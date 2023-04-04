@@ -213,11 +213,11 @@ router.get(
     console.log(req.user);
     const token = createToken(req.user._id);
     res.cookie("clubToken", token, {
-      secure: true,
+//       secure: true,
       sameSite: "None",
       httpOnly:true,
       path: "/",
-      maxAge: maxAge * 1000,
+      maxAge: maxAge,
     });
 
     res.redirect(process.env.CLIENT_URL);
