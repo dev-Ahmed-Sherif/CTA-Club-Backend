@@ -74,6 +74,10 @@ const createToken = (id) => {
   });
 };
 
+const createTokenforHeader = (id) => {
+  return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET);
+};
+
 // Getting All Users
 
 router.get("/", (req, res) => {
@@ -183,6 +187,8 @@ router.post("/login", async (req, res) => {
         path: "/",
         maxAge: maxAge * 1000,
       });
+      const tokenHeader = createTokenforHeader(user._id);
+      res.setHeader("authorization", tokenHeader);
       res.status(200).send({ data: user, token: token });
       // User.findOneAndUpdate({ email: req.body.email }, {});
       // res.send({ data: user , token:token});
