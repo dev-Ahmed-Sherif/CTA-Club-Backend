@@ -45,8 +45,8 @@ passport.use(
     },
     (accessToken, refreshToken, profile, done) => {
       console.log("hello from passport");
-      console.log(accessToken);
-      console.log(refreshToken);
+      // console.log(accessToken);
+      // console.log(refreshToken);
       // console.log(email);
       console.log(profile);
       // console.log(profile.emails[0].value);
@@ -71,7 +71,7 @@ passport.use(
                 console.log(err);
               } else {
                 console.log(data);
-                console.log(data._id);
+                // console.log(data._id);
                 done(null, data);
                 // done(null, null, { message: "No User with that Email" });
               }
