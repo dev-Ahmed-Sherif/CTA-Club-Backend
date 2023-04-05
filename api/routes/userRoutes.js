@@ -214,10 +214,10 @@ router.get(
     console.log(req.user);
     const token = createToken(req.user._id);
     res.cookie("clubsToken", token, {
-      secure: true,
-      sameSite: "strict",
-//       httpOnly:true,
-      path: "/",
+//       secure: true,
+//       sameSite: "strict",
+      httpOnly:true,
+//       path: "/",
       maxAge: maxAge * 1000,
     });
 
