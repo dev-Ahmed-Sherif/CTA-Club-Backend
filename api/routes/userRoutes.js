@@ -210,12 +210,11 @@ router.get(
     failureRedirect: process.env.CLIENT_URL,
   }),
   (req, res) => {
-    console.log(req);
+    console.log(req.cookies);
     console.log(req.user);
     const token = createToken(req.user._id);
     res.cookie("clubsToken", token, {
-      domain:"localhost",
-//       secure: true,
+      secure: true,
       sameSite: "strict",
 //       httpOnly:true,
       path: "/",
