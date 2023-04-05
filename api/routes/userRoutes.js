@@ -213,7 +213,7 @@ router.get(
     console.log(req);
     console.log(req.user);
     const token = createToken(req.user._id);
-    res.cookie("clubToken", token, {
+    res.cookie("clubsToken", token, {
       secure: true,
       sameSite: "None",
 //       httpOnly:true,
