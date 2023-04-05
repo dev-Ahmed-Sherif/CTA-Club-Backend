@@ -215,7 +215,7 @@ router.get(
     const token = createToken(req.user._id);
     res.cookie("clubsToken", token, {
       domain:"localhost",
-      secure: true,
+//       secure: true,
       sameSite: "strict",
 //       httpOnly:true,
       path: "/",
