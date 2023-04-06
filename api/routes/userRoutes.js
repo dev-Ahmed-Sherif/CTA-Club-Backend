@@ -182,7 +182,7 @@ router.post("/login", async (req, res) => {
       res.cookie("clubToken", token, {
 //         domain: "cta.onrender.com",
         secure: true,
-        sameSite: "strict",
+        sameSite: "None",
         httpOnly:true,
         path: "/",
         maxAge: maxAge * 1000,
