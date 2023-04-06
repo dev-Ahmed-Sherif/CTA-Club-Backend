@@ -181,7 +181,7 @@ router.post("/login", async (req, res) => {
       console.log(token);
       res.cookie("clubToken", token, {
 //         domain: "cta.onrender.com",
-//         secure: true,
+        secure: true,
         sameSite: "strict",
         httpOnly:true,
         path: "/",
