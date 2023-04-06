@@ -187,8 +187,8 @@ router.post("/login", async (req, res) => {
         path: "/",
         maxAge: maxAge * 1000,
       });
-//       const tokenHeader = createTokenforHeader(user._id);
-//       res.setHeader("authorization", tokenHeader);
+      const tokenHeader = createTokenforHeader(user._id);
+      res.setHeader("authorization", tokenHeader);
       res.status(200).send({ data: user, token: token });
       // User.findOneAndUpdate({ email: req.body.email }, {});
       // res.send({ data: user , token:token});
@@ -213,12 +213,13 @@ router.get(
     console.log(req.cookies);
     console.log(req.user);
     const token = createToken(req.user._id);
+    res.setHeader
     res.cookie("clubsToken", token, {
-//       secure: true,
-//       sameSite: "strict",
-      httpOnly:true,
-//       path: "/",
-      maxAge: maxAge * 1000,
+        secure: true,
+        sameSite: "None",
+        httpOnly:true,
+        path: "/",
+        maxAge: maxAge * 1000,
     });
 
     res.redirect(process.env.CLIENT_URL);
