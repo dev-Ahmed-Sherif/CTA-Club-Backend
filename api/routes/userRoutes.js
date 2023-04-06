@@ -179,14 +179,14 @@ router.post("/login", async (req, res) => {
       // console.log(passConfirm);
       const token = createToken(user._id);
       console.log(token);
-//       res.cookie("clubToken", token, {
+      res.cookie("clubToken", token, {
 //         domain: "cta.onrender.com",
 //         secure: true,
 //         sameSite: "None",
-//         httpOnly:true,
-//         path: "/",
-//         maxAge: maxAge * 1000,
-//       });
+        httpOnly:true,
+        path: "/",
+        maxAge: maxAge * 1000,
+      });
 //       const tokenHeader = createTokenforHeader(user._id);
 //       res.setHeader("authorization", tokenHeader);
       res.status(200).send({ data: user, token: token });
