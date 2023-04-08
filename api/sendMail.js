@@ -1,4 +1,3 @@
-
 const mailer = require("nodemailer");
 
 module.exports = async (email, subject, text) => {
