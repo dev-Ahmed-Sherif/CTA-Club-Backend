@@ -1,4 +1,3 @@
-
 const express = require("express");
 const app = express();
 const router = express.Router();
@@ -28,6 +27,7 @@ const session = require("express-session");
 //   console.log(user);
 //   return user;
 // });
+
 
 // Define Multer
 
@@ -74,10 +74,6 @@ const createToken = (id) => {
   });
 };
 
-const createTokenforHeader = (id) => {
-  return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET);
-};
-
 // Getting All Users
 
 router.get("/", (req, res) => {
@@ -95,21 +91,17 @@ router.get("/", (req, res) => {
 router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.cookies.clubToken);
   console.log(req.body);
-  console.log(req.body ? req.body : null);
-  console.log(req.body._id);
-  console.log(req.body._id ? req.body._id : null);
-  if (req.body._id == undefined) {
-    console.log("hello user details with token only");
+  if (req.body._id === null) {
     jwt.verify(
       req.cookies.clubToken,
       process.env.ACCESS_TOKEN_SECRET,
-      async (err, decodedToken) => {
+      (err, decodedToken) => {
         if (err) {
           console.log(err.message);
           res.send({ message: err.message });
         } else {
           console.log(decodedToken);
-          await User.findOne({ _id: decodedToken.id })
+          User.findOne({ _id: decodedToken.id })
             .populate({ path: "userplaygrounds" })
             .then((result) => {
               console.log(result);
@@ -119,7 +111,6 @@ router.post("/user-details", requireAuth, (req, res) => {
       }
     );
   } else {
-    console.log("hello user details with token and id");
     User.findOne({ _id: req.body._id })
       .populate({ path: "userplaygrounds" })
       .then((result) => {
@@ -178,17 +169,10 @@ router.post("/login", async (req, res) => {
     if (passConfirm) {
       // console.log(passConfirm);
       const token = createToken(user._id);
-      console.log(token);
       res.cookie("clubToken", token, {
-//         domain: "cta.onrender.com",
-        secure: true,
-        sameSite: "None",
-        httpOnly:true,
-        path: "/",
+        httpOnly: true,
         maxAge: maxAge * 1000,
       });
-      const tokenHeader = createTokenforHeader(user._id);
-      res.setHeader("authorization", tokenHeader);
       res.status(200).send({ data: user, token: token });
       // User.findOneAndUpdate({ email: req.body.email }, {});
       // res.send({ data: user , token:token});
@@ -202,6 +186,33 @@ router.post("/login", async (req, res) => {
 
 // User Login with Google
 
+router.get("/login/success", (req, res) => {
+  // console.log(req);
+  if (req.user) {
+    const token = createToken(req.user._id);
+    res.cookie("clubToken", token, {
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: maxAge * 1000,
+    });
+    res.status(200).send({ data: req.user, token: token });
+    // res.json({ error: false, message: "Success Loged In", user: req.user });
+  } else {
+    res.send({
+      error: true,
+      message: "Not Authorized",
+    });
+  }
+});
+
+router.get("/login/failed", (req, res) => {
+  res.json({
+    error: true,
+    message: "Log in failure",
+  });
+});
+
 router.get(
   "/google/callback",
   passport.authenticate("google", {
@@ -210,28 +221,18 @@ router.get(
     failureRedirect: process.env.CLIENT_URL,
   }),
   (req, res) => {
-    console.log(req.cookies);
     console.log(req.user);
     const token = createToken(req.user._id);
-    res.setHeader
-    res.cookie("clubsToken", token, {
-        secure: true,
-        sameSite: "None",
-        httpOnly:true,
-        path: "/",
-        maxAge: maxAge * 1000,
+    res.cookie("clubToken", token, {
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: maxAge * 1000,
     });
 
     res.redirect(process.env.CLIENT_URL);
   }
 );
-
-// Logout User
-
-router.post("/logout", (req, res) => {
-  res.cookie("clubToken", "", { maxAge: 1 });
-  res.redirect(process.env.CLIENT_URL);
-});
 
 // User Forget Password
 
@@ -279,7 +280,6 @@ router.post("/reset-pass", async (req, res) => {
                 console.log(err);
                 res.send({ message: "حدث خطا أثناء تعديل الباسورد" });
               } else {
-                // console.log(data);
                 res.send({ message: "تم تعديل الباسورد بنجاح" });
               }
             }
@@ -292,8 +292,31 @@ router.post("/reset-pass", async (req, res) => {
   }
 });
 
-//User Photo Update
+// Logout User
 
+router.post("/logout", (req, res) => {
+  res.cookie("clubToken", "", { maxAge: 1 });
+  res.redirect(process.env.CLIENT_URL);
+});
+
+// router.post(
+//   "/login",
+//   passport.authenticate("local", {
+//     successRedirect: "/sucess",
+//     failureRedirect: "/login-failed",
+//     failureFlash: true,
+//   })
+// );
+
+// router.get("/sucess", (req, res) => {
+//   res.send("hello success");
+// });
+
+// router.get("/login-failed", (req, res) => {
+//   res.send("hello failed");
+// });
+
+//User Photo Update
 router.patch(
   "/user-photo-update",
   requireAuth,
@@ -332,19 +355,42 @@ router.patch("/user-details-update", requireAuth, async (req, res) => {
   console.log(id);
   var firstname = req.body.firstname;
   var lastname = req.body.lastname;
-  // var email = req.body.email;
-  // var passwordNew = await bcrypt.hash(req.body.password, 10);
-  // const passwordNew = req.body.password;
-  // console.log(passwordNew);
+  var email = req.body.email;
   var number = req.body.number;
   User.findOneAndUpdate(
     { _id: id },
     {
       firstname: firstname,
       lastname: lastname,
-      // email: email,
-      // password: passwordNew,
+      email: email,
       number: number,
+    },
+    (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(data);
+        res.send({ message: "تم تعديل البيانات بنجاح" });
+      }
+    }
+  );
+});
+
+// user-password-update
+router.patch("/user-password-update", requireAuth, async (req, res) => {
+  console.log(req.file);
+  console.log(req.body);
+  var id = req.body._id;
+  console.log(id);
+  var email = req.body.email;
+  var passwordNew = await bcrypt.hash(req.body.password, 10);
+  // const passwordNew = req.body.password;
+  console.log(passwordNew);
+  User.findOneAndUpdate(
+    { _id: id },
+    {
+      email: email,
+      password: passwordNew,
     },
     (err, data) => {
       if (err) {
