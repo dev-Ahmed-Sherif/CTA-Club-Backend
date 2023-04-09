@@ -4,9 +4,9 @@ const User = require("../models/User");
 require("dotenv").config();
 
 const requireAuth = (req, res, next) => {
-  console.log(req.cookies);
+  console.log(req.Cookies);
   console.log(req.headers);
-  const token1 = req.cookies.clubToken;
+  const token1 = req.Cookies.clubToken;
   //const token2 = req.Cookies.clubToken;
   console.log(token1);
   //console.log(token2);
