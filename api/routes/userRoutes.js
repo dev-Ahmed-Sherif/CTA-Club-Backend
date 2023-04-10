@@ -93,7 +93,7 @@ router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.body);
   if (req.body._id === undefined) {
     jwt.verify(
-      req.cookies.clubToken,
+      req.body.clubToken,
       process.env.ACCESS_TOKEN_SECRET,
       (err, decodedToken) => {
         if (err) {
@@ -260,7 +260,7 @@ router.post("/forget-pass", async (req, res) => {
 // User Password Reset
 
 router.post("/reset-pass", async (req, res) => {
-  const token = req.cookies.clubToken;
+  const token = req.body.clubToken;
   if (token) {
     jwt.verify(
       token,
