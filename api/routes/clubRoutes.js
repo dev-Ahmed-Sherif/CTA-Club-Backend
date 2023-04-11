@@ -62,8 +62,8 @@ router.get("/", (req, res) => {
 
 router.post(
   "/add",
-  requireAuth,
   upload.single("photoURL"),
+  requireAuth,
   function (req, res, next) {
     console.log(req.file);
     console.log(req.body);
@@ -143,8 +143,8 @@ router.patch("/update", requireAuth,
   });
 
 // Update Club photo
-router.patch("/update-club-photo", requireAuth, 
-upload.single("photoURL"), 
+router.patch("/update-club-photo", upload.single("photoURL"), 
+requireAuth, 
 (req, res) => {
   console.log(req.body);
   var id = req.body._id;
