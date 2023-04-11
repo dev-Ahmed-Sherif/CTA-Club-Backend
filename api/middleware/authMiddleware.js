@@ -6,7 +6,7 @@ require("dotenv").config();
 const requireAuth = (req, res, next) => {
 //   console.log(req.cookies);
 //   console.log(req);
-//   console.log(req.file);
+  console.log(req.file);
   console.log(req.body);
   const token1 = req.body.clubToken;
   //const token2 = req.Cookies.clubToken;
