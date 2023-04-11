@@ -319,16 +319,16 @@ router.post("/logout", (req, res) => {
 //User Photo Update
 router.patch(
   "/user-photo-update",
-  requireAuth,
   upload.single("personalphoto"),
+  requireAuth,
   async (req, res) => {
     console.log(req.file);
     console.log(req.body);
 
     var id = req.body._id;
     console.log(id);
-//     var personalphoto = correctPath(req.file?.path);
-    var personalphoto = req.file?.path;
+    var personalphoto = correctPath(req.file?.path);
+//     var personalphoto = req.file?.path;
     console.log(personalphoto);
     User.findOneAndUpdate(
       { _id: id },
