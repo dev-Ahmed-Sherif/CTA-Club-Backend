@@ -327,7 +327,8 @@ router.patch(
 
     var id = req.body._id;
     console.log(id);
-    var personalphoto = correctPath(req.file?.path);
+//     var personalphoto = correctPath(req.file?.path);
+    var personalphoto = req.file?.path;
     console.log(personalphoto);
     User.findOneAndUpdate(
       { _id: id },
