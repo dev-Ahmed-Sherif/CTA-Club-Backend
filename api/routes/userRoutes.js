@@ -219,19 +219,20 @@ router.get(
     scope: ["profile", "email"],
     session: false,
     failureRedirect: process.env.CLIENT_URL,
+    successRedirect: process.env.CLIENT_URL
   }),
-  (req, res) => {
-    console.log(req.user);
-    const token = createToken(req.user._id);
-    res.cookie("clubToken", token, {
-      secure: true,
-      sameSite: "strict",
-      path: "/",
-      maxAge: maxAge * 1000,
-    });
+//   (req, res) => {
+//     console.log(req.user);
+//     const token = createToken(req.user._id);
+//     res.cookie("clubToken", token, {
+//       secure: true,
+//       sameSite: "strict",
+//       path: "/",
+//       maxAge: maxAge * 1000,
+//     });
 
-    res.redirect(process.env.CLIENT_URL);
-  }
+//     res.redirect(process.env.CLIENT_URL);
+//   }
 );
 
 // User Forget Password
