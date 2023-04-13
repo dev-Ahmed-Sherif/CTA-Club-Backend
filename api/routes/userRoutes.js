@@ -76,7 +76,7 @@ const createToken = (id) => {
 
 // Getting All Users
 
-router.get("/", (req, res) => {
+router.get("/",requireAuth, (req, res) => {
   User.find(function (err, data) {
     if (err) {
       res.send({ message: "Error ! Please check your query and try again." });
