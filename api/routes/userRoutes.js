@@ -187,7 +187,7 @@ router.post("/login", async (req, res) => {
 // User Login with Google
 
 router.get("/login/success", (req, res) => {
-  console.log(req,cookies);
+  console.log(req.cookies);
   if (req.cookies.clubToken) {
     jwt.verify(
       req.cookies.clubToken,
