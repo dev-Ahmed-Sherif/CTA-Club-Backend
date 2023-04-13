@@ -188,9 +188,9 @@ router.post("/login", async (req, res) => {
 
 router.get("/login/success", (req, res) => {
   console.log(req.cookies);
-  if (req.cookies.clubToken) {
+  if (req.cookies.clubTokenSer) {
     jwt.verify(
-      req.cookies.clubToken,
+      req.cookies.clubTokenSer,
       process.env.ACCESS_TOKEN_SECRET,
       (err, decodedToken) => {
         if (err) {
@@ -230,14 +230,14 @@ router.get(
   (req, res) => {
     console.log(req.user);
     const token = createToken(req.user._id);
-    res.cookie("clubToken", token, {
+    res.cookie("clubTokenSer", token, {
       secure: true,
       sameSite: "none",
       path: "/",
       maxAge: maxAge * 1000,
     });
 
-    res.redirect(process.env.CLIENT_URL);
+    res.redirect(process.env.CLIENT_URL_RE);
   }
 );
 
