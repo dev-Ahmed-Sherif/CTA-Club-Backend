@@ -187,16 +187,23 @@ router.post("/login", async (req, res) => {
 // User Login with Google
 
 router.get("/login/success", (req, res) => {
-  // console.log(req);
-  if (req.user) {
-    const token = createToken(req.user._id);
-    res.cookie("clubToken", token, {
-      secure: true,
-      sameSite: "strict",
-      path: "/",
-      maxAge: maxAge * 1000,
-    });
-    res.status(200).send({ data: req.user, token: token });
+  console.log(req,cookies);
+  if (req.cookies.clubToken) {
+    jwt.verify(
+      req.cookies.clubToken,
+      process.env.ACCESS_TOKEN_SECRET,
+      (err, decodedToken) => {
+        if (err) {
+          console.log(err.message);
+          res.send({ message: err.message });
+        } else {
+          console.log(decodedToken);
+          const token = createToken(decodedToken.id);
+          res.status(200).send({ token: token });
+        }
+      }
+    );
+    
     // res.json({ error: false, message: "Success Loged In", user: req.user });
   } else {
     res.send({
@@ -218,21 +225,20 @@ router.get(
   passport.authenticate("google", {
     scope: ["profile", "email"],
     session: false,
-    failureRedirect: process.env.CLIENT_URL,
-    successRedirect: process.env.CLIENT_URL
+    failureRedirect: process.env.CLIENT_URL
   }),
-//   (req, res) => {
-//     console.log(req.user);
-//     const token = createToken(req.user._id);
-//     res.cookie("clubToken", token, {
-//       secure: true,
-//       sameSite: "strict",
-//       path: "/",
-//       maxAge: maxAge * 1000,
-//     });
+  (req, res) => {
+    console.log(req.user);
+    const token = createToken(req.user._id);
+    res.cookie("clubToken", token, {
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: maxAge * 1000,
+    });
 
-//     res.redirect(process.env.CLIENT_URL);
-//   }
+    res.redirect(process.env.CLIENT_URL);
+  }
 );
 
 // User Forget Password
