@@ -143,10 +143,10 @@ router.post("/register", async (req, res) => {
             console.log(data);
             console.log(data._id);
             const token = createToken(data._id);
-            res.cookie("clubToken", token, {
-              httpOnly: true,
-              maxAge: maxAge * 1000,
-            });
+//             res.cookie("clubToken", token, {
+//               httpOnly: true,
+//               maxAge: maxAge * 1000,
+//             });
             res.send({ message: "تم انشاء حساب بنجاح يرجى تسجيل الدخول" });
           }
         }
@@ -169,10 +169,10 @@ router.post("/login", async (req, res) => {
     if (passConfirm) {
       // console.log(passConfirm);
       const token = createToken(user._id);
-      res.cookie("clubToken", token, {
-        httpOnly: true,
-        maxAge: maxAge * 1000,
-      });
+//       res.cookie("clubToken", token, {
+//         httpOnly: true,
+//         maxAge: maxAge * 1000,
+//       });
       res.status(200).send({ data: user, token: token });
       // User.findOneAndUpdate({ email: req.body.email }, {});
       // res.send({ data: user , token:token});
@@ -248,17 +248,17 @@ router.post("/forget-pass", async (req, res) => {
   if (user) {
     const token = createToken(user._id);
     // Enable secure when publish
-    res.cookie("clubToken", token, {
-      // secure: true,
-      sameSite: "strict",
-      path: "/",
-      maxAge: maxAge * 1000,
-    });
+//     res.cookie("clubToken", token, {
+//       secure: true,
+//       sameSite: "strict",
+//       path: "/",
+//       maxAge: maxAge * 1000,
+//     });
 
     const link = `${process.env.CLIENT_URL}/password-reset/${user._id}`;
     await sendMail(user.email, "Password Reset", link);
 
-    res.send({ message: "تم إرسال رسالة الى إلايميل الخاص بيك" });
+    res.send({ message: "تم إرسال رسالة الى إلايميل الخاص بيك" , token : token });
   } else {
     res.send({ message: "هذا الايميل لا يوجد له حساب لدينا" });
   }
