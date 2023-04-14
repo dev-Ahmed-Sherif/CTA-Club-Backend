@@ -302,11 +302,11 @@ router.post("/reset-pass", async (req, res) => {
 // Logout User
 
 router.get("/logout", (req, res) => {
-  res.cookie("clubTokenSer", null, {
+  console.log("logout")
+  res.clearCookie("clubTokenSer", {
       secure: true,
       sameSite: "none",
       path: "/",
-      maxAge: 1000,
     });
   res.redirect(process.env.CLIENT_URL);
 });
