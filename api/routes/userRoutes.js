@@ -307,7 +307,9 @@ router.get("/logout", (req, res) => {
       secure: true,
       sameSite: "none",
       path: "/",
+      maxAge: maxAge * 1000
     });
+  res.send("done");
 //   res.redirect(process.env.CLIENT_URL);
 });
 
