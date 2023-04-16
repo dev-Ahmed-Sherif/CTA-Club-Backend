@@ -199,7 +199,7 @@ router.get("/login/success", (req, res) => {
         } else {
           console.log(decodedToken);
           const token = createToken(decodedToken.id);
-          res.status(200).send({ token: token });
+          res.status(200).send({ token: token , _id : decodedToken.id });
         }
       }
     );
