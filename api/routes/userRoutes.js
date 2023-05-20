@@ -294,7 +294,7 @@ router.post("/reset-pass", async (req, res) => {
 
 // Logout User
 
-router.post("/logout", (req, res) => {
+router.get("/logout", (req, res) => {
   console.log("logout")
   res.clearCookie("clubTokenSer", {
       secure: true,
