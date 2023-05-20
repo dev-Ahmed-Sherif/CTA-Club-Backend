@@ -28,18 +28,11 @@ const session = require("express-session");
 //   return user;
 // });
 
-
 // Define Multer
 
+const sharp = require("sharp");
 const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./public/person");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (
@@ -57,7 +50,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 15,
+    fileSize: 1024 * 1024 * 5,
   },
   fileFilter: fileFilter,
 });
@@ -76,7 +69,7 @@ const createToken = (id) => {
 
 // Getting All Users
 
-router.get("/",requireAuth, (req, res) => {
+router.get("/", (req, res) => {
   User.find(function (err, data) {
     if (err) {
       res.send({ message: "Error ! Please check your query and try again." });
@@ -91,9 +84,9 @@ router.get("/",requireAuth, (req, res) => {
 router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.cookies.clubToken);
   console.log(req.body);
-  if (req.body._id == null || req.body._id == undefined) {
+  if (req.body._id === null) {
     jwt.verify(
-      req.body.clubToken,
+      req.cookies.clubToken,
       process.env.ACCESS_TOKEN_SECRET,
       (err, decodedToken) => {
         if (err) {
@@ -143,10 +136,10 @@ router.post("/register", async (req, res) => {
             console.log(data);
             console.log(data._id);
             const token = createToken(data._id);
-//             res.cookie("clubToken", token, {
-//               httpOnly: true,
-//               maxAge: maxAge * 1000,
-//             });
+            res.cookie("clubToken", token, {
+              httpOnly: true,
+              maxAge: maxAge * 1000,
+            });
             res.send({ message: "تم انشاء حساب بنجاح يرجى تسجيل الدخول" });
           }
         }
@@ -169,10 +162,10 @@ router.post("/login", async (req, res) => {
     if (passConfirm) {
       // console.log(passConfirm);
       const token = createToken(user._id);
-//       res.cookie("clubToken", token, {
-//         httpOnly: true,
-//         maxAge: maxAge * 1000,
-//       });
+      res.cookie("clubToken", token, {
+        httpOnly: true,
+        maxAge: maxAge * 1000,
+      });
       res.status(200).send({ data: user, token: token });
       // User.findOneAndUpdate({ email: req.body.email }, {});
       // res.send({ data: user , token:token});
@@ -187,23 +180,16 @@ router.post("/login", async (req, res) => {
 // User Login with Google
 
 router.get("/login/success", (req, res) => {
-  console.log(req.cookies);
-  if (req.cookies.clubTokenSer) {
-    jwt.verify(
-      req.cookies.clubTokenSer,
-      process.env.ACCESS_TOKEN_SECRET,
-      (err, decodedToken) => {
-        if (err) {
-          console.log(err.message);
-          res.send({ message: err.message });
-        } else {
-          console.log(decodedToken);
-          const token = createToken(decodedToken.id);
-          res.status(200).send({ token: token , _id : decodedToken.id });
-        }
-      }
-    );
-    
+  // console.log(req);
+  if (req.user) {
+    const token = createToken(req.user._id);
+    res.cookie("clubToken", token, {
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: maxAge * 1000,
+    });
+    res.status(200).send({ data: req.user, token: token });
     // res.json({ error: false, message: "Success Loged In", user: req.user });
   } else {
     res.send({
@@ -225,19 +211,19 @@ router.get(
   passport.authenticate("google", {
     scope: ["profile", "email"],
     session: false,
-    failureRedirect: process.env.CLIENT_URL
+    failureRedirect: process.env.CLIENT_URL,
   }),
   (req, res) => {
     console.log(req.user);
     const token = createToken(req.user._id);
-    res.cookie("clubTokenSer", token, {
+    res.cookie("clubToken", token, {
       secure: true,
-      sameSite: "none",
+      sameSite: "strict",
       path: "/",
       maxAge: maxAge * 1000,
     });
 
-    res.redirect(process.env.CLIENT_URL_RE);
+    res.redirect(process.env.CLIENT_URL);
   }
 );
 
@@ -248,17 +234,17 @@ router.post("/forget-pass", async (req, res) => {
   if (user) {
     const token = createToken(user._id);
     // Enable secure when publish
-//     res.cookie("clubToken", token, {
-//       secure: true,
-//       sameSite: "strict",
-//       path: "/",
-//       maxAge: maxAge * 1000,
-//     });
+    res.cookie("clubToken", token, {
+      // secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: maxAge * 1000,
+    });
 
     const link = `${process.env.CLIENT_URL}/password-reset/${user._id}`;
     await sendMail(user.email, "Password Reset", link);
 
-    res.send({ message: "تم إرسال رسالة الى إلايميل الخاص بيك" , token : token });
+    res.send({ message: "تم إرسال رسالة الى إلايميل الخاص بيك" });
   } else {
     res.send({ message: "هذا الايميل لا يوجد له حساب لدينا" });
   }
@@ -267,7 +253,7 @@ router.post("/forget-pass", async (req, res) => {
 // User Password Reset
 
 router.post("/reset-pass", async (req, res) => {
-  const token = req.body.clubToken;
+  const token = req.cookies.clubToken;
   if (token) {
     jwt.verify(
       token,
@@ -301,16 +287,9 @@ router.post("/reset-pass", async (req, res) => {
 
 // Logout User
 
-router.get("/logout", (req, res) => {
-  console.log("logout")
-  res.clearCookie("clubTokenSer", {
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: maxAge * 1000
-    });
-  res.send("done");
-//   res.redirect(process.env.CLIENT_URL);
+router.post("/logout", (req, res) => {
+  res.cookie("clubToken", "", { maxAge: 1 });
+  res.redirect(process.env.CLIENT_URL);
 });
 
 // router.post(
@@ -333,27 +312,29 @@ router.get("/logout", (req, res) => {
 //User Photo Update
 router.patch(
   "/user-photo-update",
-  upload.single("personalphoto"),
   requireAuth,
-  async (req, res) => {
+  upload.single("personalphoto"),
+  (req, res) => {
+    console.log("first");
     console.log(req.file);
     console.log(req.body);
 
     var id = req.body._id;
     console.log(id);
-    var personalphoto = correctPath(req.file?.path);
-//     var personalphoto = req.file?.path;
-    console.log(personalphoto);
+    var personalphoto = `public/person/`;
     User.findOneAndUpdate(
       { _id: id },
       {
-        personalphoto: personalphoto,
+        personalphoto: `${personalphoto}${req.file.originalname}`,
       },
-      (err, data) => {
+      async (err, data) => {
         if (err) {
           console.log(err);
         } else {
           console.log(data);
+          await sharp(req.file.buffer)
+            .resize({ width: 600, height: 350 })
+            .toFile(`./${personalphoto}${req.file.originalname}`);
           res.send({ message: "تم تعديل الصوره الشخصيه" });
         }
       }
