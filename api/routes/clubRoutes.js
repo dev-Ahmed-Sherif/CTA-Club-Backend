@@ -44,7 +44,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 5,
+    fileSize: 1024 * 1024 * 15,
   },
   fileFilter: fileFilter,
 });
@@ -65,8 +65,8 @@ router.get("/", (req, res) => {
 
 router.post(
   "/add",
-  requireAuth,
   upload.single("photoURL"),
+  requireAuth,
   async (req, res) => {
     console.log(req.file);
     console.log(req.body);
@@ -155,7 +155,8 @@ router.patch(
 );
 
 // Update Club photo
-router.patch("/update-club-photo", upload.single("photoURL"), (req, res) => {
+router.patch("/update-club-photo", upload.single("photoURL"),
+  requireAuth, (req, res) => {
   console.log(req.body);
   console.log(req.file);
   var id = req.body._id;
