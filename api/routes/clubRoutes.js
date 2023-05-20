@@ -14,16 +14,19 @@ function correctPath(path) {
 
 // Define Multer
 
+const sharp = require("sharp");
 const multer = require("multer");
 const mongoose = require("mongoose");
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./public/club");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "./public/club");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.originalname);
+//   },
+// });
+
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (
@@ -41,7 +44,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 15,
+    fileSize: 1024 * 1024 * 5,
   },
   fileFilter: fileFilter,
 });
@@ -62,18 +65,22 @@ router.get("/", (req, res) => {
 
 router.post(
   "/add",
-  upload.single("photoURL"),
   requireAuth,
-  function (req, res, next) {
+  upload.single("photoURL"),
+  async (req, res) => {
     console.log(req.file);
     console.log(req.body);
+    var photoURL = `public/club/`;
+    await sharp(req.file.buffer)
+      .resize({ width: 600, height: 350 })
+      .toFile(`./${photoURL}${req.file.originalname}`);
     const club = new Club({
       playgroundname: req.body.playgroundname,
       address: req.body.location,
       phonenumber: req.body.phonenumber,
       vodafonnumber: req.body.vodafonnumber,
       createdDate: new Date(),
-      photoURL: correctPath(req.file?.path),
+      photoURL: `${photoURL}${req.file.originalname}`,
     });
 
     club
@@ -109,64 +116,86 @@ router.post(
 
 // Update Club
 
-router.patch("/update", requireAuth, 
-// upload.single("photoURL"), 
-(req, res) => {
-  // console.log(req.body);
-  var id = req.body._id;
-  // console.log(id);
-  var playgroundname = req.body.playgroundname;
-  var address = req.body.location;
-  var phonenumber = req.body.phonenumber;
-  var vodafonnumber = req.body.vodafonnumber;
-  // var photoURL = req.file?.path;
-  // console.log(photoURL);
-  Club.findById(id, function (err, data) {
-    console.log('this is data ' + data);
-    data.playgroundname = playgroundname ? playgroundname : data.playgroundname;
-    data.address = address ? address : data.address;
-    data.phonenumber = phonenumber ? phonenumber : data.phonenumber;
-    data.vodafonnumber = vodafonnumber ? vodafonnumber : data.vodafonnumber;
-    // data.photoURL = photoURL ? photoURL : data.photoURL;
+router.patch(
+  "/update",
+  requireAuth,
+  // upload.single("photoURL"),
+  (req, res) => {
+    // console.log(req.body);
+    var id = req.body._id;
+    // console.log(id);
+    var playgroundname = req.body.playgroundname;
+    var address = req.body.location;
+    var phonenumber = req.body.phonenumber;
+    var vodafonnumber = req.body.vodafonnumber;
+    // var photoURL = req.file?.path;
     // console.log(photoURL);
-    data
-      .save()
-      .then((doc) => {
-        console.log(doc);
-        res.send({ message: "تم تعديل بيانات الملعب بنجاح" });
-      })
-      .catch((err) => {
-        console.log(err.message);
-        res.send({ message: "حدث خطأ أثناء التعديل" });
-      });
-  });
-  });
+    Club.findById(id, function (err, data) {
+      console.log("this is data " + data);
+      data.playgroundname = playgroundname
+        ? playgroundname
+        : data.playgroundname;
+      data.address = address ? address : data.address;
+      data.phonenumber = phonenumber ? phonenumber : data.phonenumber;
+      data.vodafonnumber = vodafonnumber ? vodafonnumber : data.vodafonnumber;
+      // data.photoURL = photoURL ? photoURL : data.photoURL;
+      // console.log(photoURL);
+      data
+        .save()
+        .then((doc) => {
+          console.log(doc);
+          res.send({ message: "تم تعديل بيانات الملعب بنجاح" });
+        })
+        .catch((err) => {
+          console.log(err.message);
+          res.send({ message: "حدث خطأ أثناء التعديل" });
+        });
+    });
+  }
+);
 
 // Update Club photo
-router.patch("/update-club-photo", upload.single("photoURL"), 
-requireAuth, 
-(req, res) => {
+router.patch("/update-club-photo", upload.single("photoURL"), (req, res) => {
   console.log(req.body);
+  console.log(req.file);
   var id = req.body._id;
   console.log(id);
-  var photoURL = correctPath(req.file?.path);
-  console.log('this is photoURL ' +photoURL);
+  var photoURL = `public/club/`;
+  // var photoURL = correctPath(req.file?.path);
+  console.log("this is photoURL " + `${photoURL}${req.file.originalname}`);
 
-  Club.findById(id, function (err, data) {
-    console.log('this is data ' + data);
-    data.photoURL = photoURL ? photoURL : data.photoURL;
-    console.log('this is photoURL ' +photoURL);
-    data
-      .save()
-      .then((doc) => {
-        console.log(doc);
+  // res.send("Done");
+  Club.findOneAndUpdate(
+    { _id: id },
+    { photoURL: `${photoURL}${req.file.originalname}` },
+    async (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        await sharp(req.file.buffer)
+          .resize({ width: 600, height: 350 })
+          .toFile(`./${photoURL}${req.file.originalname}`);
+        console.log("this is data " + data);
+        console.log(
+          "this is photoURL " + `${photoURL}${req.file.originalname}`
+        );
         res.send({ message: "تم تعديل صوره الملعب بنجاح" });
-      })
-      .catch((err) => {
-        console.log(err.message);
-        res.send({ message: "حدث خطأ أثناء التعديل" });
-      });
-  });
+      }
+      // data.photoURL = data.photoURL = `${photoURL}${req.file.originalname}`
+      //   ? data.photoURL
+      //   : `${photoURL}${req.file.originalname}`;
+      // data
+      //   .save()
+      //   .then((doc) => {
+      //     console.log(doc);
+      //     res.send({ message: "تم تعديل صوره الملعب بنجاح" });
+      //   })
+      //   .catch((err) => {
+      //     console.log(err.message);
+      //     res.send({ message: "حدث خطأ أثناء التعديل" });
+      //   });
+    }
+  );
   // Club.findOneAndUpdate(
   //   { _id: id },
   //   {
@@ -180,7 +209,7 @@ requireAuth,
   //       res.send({ message: "تم تعديل الصوره الشخصيه" });
   //     }
   // } );
-  });
+});
 
 // Delete Club
 
@@ -253,7 +282,6 @@ router.patch("/add-Reservation", (req, res) => {
     );
   });
 });
-
 
 // Accept Request
 
@@ -344,7 +372,7 @@ router.delete("/delete-request", requireAuth, (req, res) => {
     {
       $pull: {
         requests: {
-          id: { $eq: req.body.id } ,
+          id: { $eq: req.body.id },
         },
       },
     },
@@ -385,17 +413,16 @@ router.patch("/add-table-request", requireAuth, (req, res) => {
   );
 });
 
-
 // Delete Table Request
 
 router.delete("/delete-Table-request", requireAuth, (req, res) => {
   console.log(req.body);
   Club.findOneAndUpdate(
-    { _id: req.body.playgroundid  },
+    { _id: req.body.playgroundid },
     {
       $pull: {
         table: {
-          id: { $eq: req.body.id } ,
+          id: { $eq: req.body.id },
         },
       },
     },
@@ -409,7 +436,5 @@ router.delete("/delete-Table-request", requireAuth, (req, res) => {
     }
   );
 });
-
-
 
 module.exports = router;
