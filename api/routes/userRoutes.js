@@ -302,6 +302,7 @@ router.get("/logout", (req, res) => {
       path: "/",
     });
   res.redirect(process.env.CLIENT_URL);
+  res.send("done");
 });
 
 // router.post(
