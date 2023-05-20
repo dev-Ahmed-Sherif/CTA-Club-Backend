@@ -57,7 +57,7 @@ const upload = multer({
 
 // Creation of Authentication Token
 
-const maxAge = 24 * 60 * 60; // milli sec
+const maxAge = 7 * 24 * 60 * 60; // milli sec
 
 // expiresIn receive milli sec
 
@@ -84,9 +84,9 @@ router.get("/", (req, res) => {
 router.post("/user-details", requireAuth, (req, res) => {
   console.log(req.cookies.clubToken);
   console.log(req.body);
-  if (req.body._id === null) {
+  if (req.body._id == null || req.body._id == undefined) {
     jwt.verify(
-      req.cookies.clubToken,
+      req.body.clubToken,
       process.env.ACCESS_TOKEN_SECRET,
       (err, decodedToken) => {
         if (err) {
