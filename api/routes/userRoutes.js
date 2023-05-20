@@ -234,6 +234,18 @@ router.get(
   }
 );
 
+// Logout
+
+router.get("/logout", (req, res) => {
+  console.log("logout")
+  res.clearCookie("clubTokenSer", {
+      secure: true,
+      sameSite: "none",
+      path: "/",
+    });
+  res.redirect(process.env.CLIENT_URL);
+});
+
 // User Forget Password
 
 router.post("/forget-pass", async (req, res) => {
