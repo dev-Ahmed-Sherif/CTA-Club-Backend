@@ -162,10 +162,10 @@ router.post("/login", async (req, res) => {
     if (passConfirm) {
       // console.log(passConfirm);
       const token = createToken(user._id);
-      res.cookie("clubToken", token, {
-        httpOnly: true,
-        maxAge: maxAge * 1000,
-      });
+//       res.cookie("clubToken", token, {
+//         httpOnly: true,
+//         maxAge: maxAge * 1000,
+//       });
       res.status(200).send({ data: user, token: token });
       // User.findOneAndUpdate({ email: req.body.email }, {});
       // res.send({ data: user , token:token});
@@ -180,16 +180,23 @@ router.post("/login", async (req, res) => {
 // User Login with Google
 
 router.get("/login/success", (req, res) => {
-  // console.log(req);
-  if (req.user) {
-    const token = createToken(req.user._id);
-    res.cookie("clubToken", token, {
-      secure: true,
-      sameSite: "strict",
-      path: "/",
-      maxAge: maxAge * 1000,
-    });
-    res.status(200).send({ data: req.user, token: token });
+  console.log(req.cookies);
+  if (req.cookies.clubTokenSer) {
+    jwt.verify(
+      req.cookies.clubTokenSer,
+      process.env.ACCESS_TOKEN_SECRET,
+      (err, decodedToken) => {
+        if (err) {
+          console.log(err.message);
+          res.send({ message: err.message });
+        } else {
+          console.log(decodedToken);
+          const token = createToken(decodedToken.id);
+          res.status(200).send({ token: token , _id : decodedToken.id });
+        }
+      }
+    );
+    
     // res.json({ error: false, message: "Success Loged In", user: req.user });
   } else {
     res.send({
@@ -211,19 +218,19 @@ router.get(
   passport.authenticate("google", {
     scope: ["profile", "email"],
     session: false,
-    failureRedirect: process.env.CLIENT_URL,
+    failureRedirect: process.env.CLIENT_URL
   }),
   (req, res) => {
     console.log(req.user);
     const token = createToken(req.user._id);
-    res.cookie("clubToken", token, {
+    res.cookie("clubTokenSer", token, {
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
       path: "/",
       maxAge: maxAge * 1000,
     });
 
-    res.redirect(process.env.CLIENT_URL);
+    res.redirect(process.env.CLIENT_URL_RE);
   }
 );
 
@@ -234,17 +241,17 @@ router.post("/forget-pass", async (req, res) => {
   if (user) {
     const token = createToken(user._id);
     // Enable secure when publish
-    res.cookie("clubToken", token, {
-      // secure: true,
-      sameSite: "strict",
-      path: "/",
-      maxAge: maxAge * 1000,
-    });
+//     res.cookie("clubToken", token, {
+//       secure: true,
+//       sameSite: "strict",
+//       path: "/",
+//       maxAge: maxAge * 1000,
+//     });
 
     const link = `${process.env.CLIENT_URL}/password-reset/${user._id}`;
     await sendMail(user.email, "Password Reset", link);
 
-    res.send({ message: "تم إرسال رسالة الى إلايميل الخاص بيك" });
+    res.send({ message: "تم إرسال رسالة الى إلايميل الخاص بيك" , token : token });
   } else {
     res.send({ message: "هذا الايميل لا يوجد له حساب لدينا" });
   }
@@ -253,7 +260,7 @@ router.post("/forget-pass", async (req, res) => {
 // User Password Reset
 
 router.post("/reset-pass", async (req, res) => {
-  const token = req.cookies.clubToken;
+  const token = req.body.clubToken;
   if (token) {
     jwt.verify(
       token,
@@ -288,7 +295,12 @@ router.post("/reset-pass", async (req, res) => {
 // Logout User
 
 router.post("/logout", (req, res) => {
-  res.cookie("clubToken", "", { maxAge: 1 });
+  console.log("logout")
+  res.clearCookie("clubTokenSer", {
+      secure: true,
+      sameSite: "none",
+      path: "/",
+    });
   res.redirect(process.env.CLIENT_URL);
 });
 
