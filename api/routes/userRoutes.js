@@ -50,7 +50,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 5,
+    fileSize: 1024 * 1024 * 15,
   },
   fileFilter: fileFilter,
 });
@@ -312,8 +312,8 @@ router.post("/logout", (req, res) => {
 //User Photo Update
 router.patch(
   "/user-photo-update",
-  requireAuth,
   upload.single("personalphoto"),
+  requireAuth,
   (req, res) => {
     console.log("first");
     console.log(req.file);
