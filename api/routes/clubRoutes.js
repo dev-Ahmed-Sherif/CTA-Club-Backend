@@ -252,6 +252,7 @@ router.patch("/add-Reservation", (req, res) => {
     to: req.body.to,
     number: req.body.number,
     vodanumber: req.body.vodanumber,
+    playgroundname:req.body.playgroundname,
     createdDate: new Date(),
   });
 
