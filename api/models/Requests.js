@@ -27,8 +27,8 @@ const requestSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
-    requests: {
-      type: Array,
+    playgroundname: {
+      type: String,
     },
     createdDate: {
       type: String,
