@@ -155,7 +155,7 @@ router.post("/register", async (req, res) => {
 // Login User
 
 router.post("/login", async (req, res) => {
-  console.log(req.body);
+  console.log(req.body.email);
   const user = await User.findOne({ email: req.body.email });
   if (user) {
     const passConfirm = await bcrypt.compare(req.body.password, user.password);
