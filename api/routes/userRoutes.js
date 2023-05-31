@@ -237,7 +237,9 @@ router.get(
 // Logout
 
 router.get("/logout", (req, res) => {
-  console.log("logout")
+  console.log("logout");
+  console.log(req);
+  console.log(res);
   res.clearCookie("clubTokenSer", {
       secure: true,
       sameSite: "none",
