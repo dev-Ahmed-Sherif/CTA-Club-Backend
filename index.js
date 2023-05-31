@@ -4,6 +4,9 @@ const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
+const corsOptions = require("./api/config/corsOptions");
+const credentials = require("./api/middleware/credentials");
+
 // Call Mongo DB Connection
 const mongo = require("./api/config/mongoose");
 
@@ -15,12 +18,14 @@ const userRouter = require("./api/routes/userRoutes");
 const clubRouter = require("./api/routes/clubRoutes");
 
 // middleware
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL,
+//     credentials: true,
+//   })
+// );
+app.use(credentials);
+app.use(cors(corsOptions));
 // app.use((req, res, next) => {
 //   res.set("Access-Control-Allow-Origin", "*");
 //   next();
