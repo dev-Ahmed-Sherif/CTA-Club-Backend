@@ -245,7 +245,8 @@ router.get("/logout", (req, res) => {
       sameSite: "none",
       path: "/",
     });
-  res.redirect(process.env.CLIENT_URL);
+//   res.redirect(process.env.CLIENT_URL);
+  res.send({data:"done"});
 });
 
 // User Forget Password
