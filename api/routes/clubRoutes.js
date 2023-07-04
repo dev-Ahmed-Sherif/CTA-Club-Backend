@@ -61,6 +61,13 @@ router.get("/", (req, res) => {
   });
 });
 
+// Get Active Clubs
+
+router.get("/active", async (req, res) => {
+  const data =  await Club.find({ status:"active" });
+      res.send(data);
+});
+
 // add Club
 
 router.post(
@@ -79,6 +86,7 @@ router.post(
       address: req.body.location,
       phonenumber: req.body.phonenumber,
       vodafonnumber: req.body.vodafonnumber,
+      status:"notactive",
       createdDate: new Date(),
       photoURL: `${photoURL}${req.file.originalname}`,
     });
@@ -212,6 +220,24 @@ router.patch("/update-club-photo", upload.single("photoURL"),
   // } );
 });
 
+// Accept Club
+
+router.patch("/accept-club",requireAuth,(req,res) => {
+  console.log(req.body);
+  Club.findOneAndUpdate(
+    {_id: req.body._id},
+    {status:"active"},
+    (err, data) => {
+    if (err) {
+      console.log(err.message);
+      res.send({ message: "حدث خطأ أثناء التعديل" });
+    } else {
+      console.log(data);
+      res.send({data:data, message: "تم تفعيل الملعب بنجاح" });
+    }
+  );
+})
+
 // Delete Club
 
 router.delete("/delete", requireAuth, (req, res) => {
@@ -223,7 +249,7 @@ router.delete("/delete", requireAuth, (req, res) => {
     } else {
       console.log(data);
       User.findOneAndUpdate(
-        { email: req.body.email },
+        { userplaygrounds: {$eq:mongoose.Types.ObjectId(req.body._id)} },
         {
           $pull: { userplaygrounds: req.body._id },
         },
