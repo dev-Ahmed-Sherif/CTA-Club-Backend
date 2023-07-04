@@ -444,4 +444,17 @@ router.patch("/user-password-update", requireAuth, async (req, res) => {
 
 // Delete User
 
+router.delete("/delete", requireAuth, (req, res) => {
+  console.log(req.body);
+  User.deleteOne({ _id: req.body._id }, (err, data) => {
+    if (err) {
+      console.log(err.message);
+      res.send({ message: "حدث خطأ أثناء الحذف" });
+    } else {
+      console.log(data);
+      res.send({ message: "تم حذف اليوزر بنجاح" });
+    }
+  });
+});
+
 module.exports = router;
