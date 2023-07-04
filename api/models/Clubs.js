@@ -28,6 +28,9 @@ const clubSchema = new mongoose.Schema(
     table: {
       type: Array,
     },
+    status: {
+      type: String,
+    },
     createdDate: {
       type: String,
     },
