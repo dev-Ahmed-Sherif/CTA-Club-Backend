@@ -69,6 +69,14 @@ router.get("/active", async (req, res) => {
       res.send(data);
 });
 
+// Not Active Clubs
+
+router.get("/notactive", async (req, res) => {
+  console.log("notactive club");
+  const data =  await Club.find({ status:"notactive" });
+      res.send(data);
+});
+
 // add Club
 
 router.post(
