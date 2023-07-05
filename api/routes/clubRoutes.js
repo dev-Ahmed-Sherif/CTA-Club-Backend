@@ -64,6 +64,7 @@ router.get("/", (req, res) => {
 // Get Active Clubs
 
 router.get("/active", async (req, res) => {
+  console.log("active club");
   const data =  await Club.find({ status:"active" });
       res.send(data);
 });
