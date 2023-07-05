@@ -247,6 +247,24 @@ router.patch("/accept-club",requireAuth,(req,res) => {
     });
 });
 
+// Reject Club
+
+router.patch("/reject-club",requireAuth,(req,res) => {
+  console.log(req.body);
+  Club.findOneAndUpdate(
+    {_id: req.body._id},
+    {status: "notactive"},
+    (err, data) => {
+    if (err) {
+      console.log(err.message);
+      res.send({ message: "حدث خطأ أثناء التعديل" });
+    } else {
+      console.log(data);
+      res.send({data:data, message: "تم تفعيل الملعب بنجاح" });
+    }
+    });
+});
+
 // Delete Club
 
 router.delete("/delete", requireAuth, (req, res) => {
