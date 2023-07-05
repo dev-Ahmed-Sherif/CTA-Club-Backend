@@ -227,7 +227,7 @@ router.patch("/accept-club",requireAuth,(req,res) => {
   console.log(req.body);
   Club.findOneAndUpdate(
     {_id: req.body._id},
-    {status:"active"},
+    {status: "active"},
     (err, data) => {
     if (err) {
       console.log(err.message);
@@ -236,7 +236,7 @@ router.patch("/accept-club",requireAuth,(req,res) => {
       console.log(data);
       res.send({data:data, message: "تم تفعيل الملعب بنجاح" });
     }
-  )
+    });
 });
 
 // Delete Club
