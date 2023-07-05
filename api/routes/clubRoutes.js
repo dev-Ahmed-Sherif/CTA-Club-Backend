@@ -236,7 +236,7 @@ router.patch("/accept-club",requireAuth,(req,res) => {
       console.log(data);
       res.send({data:data, message: "تم تفعيل الملعب بنجاح" });
     }
-  );
+  )
 });
 
 // Delete Club
